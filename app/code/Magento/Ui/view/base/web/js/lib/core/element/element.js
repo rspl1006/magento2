@@ -1,5 +1,5 @@
 /**
- * Copyright © 2015 Magento. All rights reserved.
+ * Copyright © 2016 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
 define([
@@ -288,17 +288,11 @@ define([
          *
          * @param {String} path - Path to property.
          * @param {*} value - New value of the property.
-         * @param {Object} [owner] - Object with property that changed and component reference.
          * @returns {Element} Chainable.
          */
-        set: function (path, value, owner) {
+        set: function (path, value) {
             var data = this.get(path),
                 diffs;
-
-            if (_.isUndefined(data) && this.cachedComponent && owner) {
-                value = utils.nested(this.cachedComponent, path);
-                owner.component.set(owner.property, value);
-            }
 
             diffs = !_.isFunction(data) && !this.isTracked(path) ?
                 utils.compare(data, value, path) :
@@ -509,10 +503,11 @@ define([
 
         /**
          * Destroys current instance along with all of its' children.
+         * @param {Boolean} skipUpdate - skip collection update when element to be destroyed.
          */
-        destroy: function () {
+        destroy: function (skipUpdate) {
             this._dropHandlers()
-                ._clearRefs();
+                ._clearRefs(skipUpdate);
         },
 
         /**
@@ -537,14 +532,15 @@ define([
          * Removes all references to current instance and
          * calls 'destroy' method on all of its' children.
          * @private
+         * @param {Boolean} skipUpdate - skip collection update when element to be destroyed.
          *
          * @returns {Element} Chainable.
          */
-        _clearRefs: function () {
+        _clearRefs: function (skipUpdate) {
             registry.remove(this.name);
 
             this.containers.forEach(function (parent) {
-                parent.removeChild(this);
+                parent.removeChild(this, skipUpdate);
             }, this);
 
             return this;

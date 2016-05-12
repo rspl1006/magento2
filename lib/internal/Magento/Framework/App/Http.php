@@ -2,7 +2,7 @@
 /**
  * Http application
  *
- * Copyright © 2015 Magento. All rights reserved.
+ * Copyright © 2016 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
 namespace Magento\Framework\App;
@@ -67,6 +67,11 @@ class Http implements \Magento\Framework\AppInterface
     protected $registry;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param Event\Manager $eventManager
      * @param AreaList $areaList
@@ -97,6 +102,21 @@ class Http implements \Magento\Framework\AppInterface
         $this->_state = $state;
         $this->_filesystem = $filesystem;
         $this->registry = $registry;
+    }
+
+    /**
+     * Add new dependency
+     *
+     * @return \Psr\Log\LoggerInterface
+     *
+     * @deprecated
+     */
+    private function getLogger()
+    {
+        if (!$this->logger instanceof \Psr\Log\LoggerInterface) {
+            $this->logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        }
+        return $this->logger;
     }
 
     /**
@@ -277,6 +297,7 @@ class Http implements \Magento\Framework\AppInterface
     private function handleInitException(\Exception $exception)
     {
         if ($exception instanceof \Magento\Framework\Exception\State\InitException) {
+            $this->getLogger()->critical($exception);
             require $this->_filesystem->getDirectoryRead(DirectoryList::PUB)->getAbsolutePath('errors/404.php');
             return true;
         }

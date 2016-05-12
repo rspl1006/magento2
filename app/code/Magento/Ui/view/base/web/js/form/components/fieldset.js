@@ -1,5 +1,5 @@
 /**
- * Copyright © 2015 Magento. All rights reserved.
+ * Copyright © 2016 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
 define([
@@ -119,11 +119,13 @@ define([
         /**
          * Is being invoked on children validation error.
          * Sets error property to one incoming.
+         *
+         * @param {String} message - error message.
          */
-        onChildrenError: function () {
+        onChildrenError: function (message) {
             var hasErrors = this.elems.some('error');
 
-            this.error(hasErrors);
+            this.error(hasErrors || message);
         },
 
         /**

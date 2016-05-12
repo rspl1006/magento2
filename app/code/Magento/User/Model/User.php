@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
+ * Copyright © 2016 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
 namespace Magento\User\Model;
@@ -614,6 +614,7 @@ class User extends AbstractModel implements StorageInterface, UserInterface
         $data = $this->getResource()->loadByUsername($username);
         if ($data !== false) {
             $this->setData($data);
+            $this->setOrigData();
         }
         return $this;
     }
